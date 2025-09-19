@@ -3,6 +3,7 @@ import { failedPayment } from "../notifications";
 import InputField from "./InputField";
 import Button from "./Button";
 import axios from 'axios';
+import { Link } from "react-router-dom";
 
 export default function Login() {
     const [form, setForm] = useState({ name: "", email: "", phone: "" });
@@ -61,6 +62,7 @@ export default function Login() {
                         method={handleChange}
                         placeholder="Enter Phone"
                     />
+                    <Link className="text-[14px] flex justify-end underline italic text-orange-500" to={"/admin-access"}>Admin Login</Link>
                 </form>
                 <Button className="w-fit mx-auto  flex items-center" label={"Save and Pay"} onClick={handleLogin} />
             </div>

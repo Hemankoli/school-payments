@@ -86,15 +86,15 @@ module.exports.checkPayment = async (req, res) => {
     const data = response.data;
     await OrdersStatus.create({
       collect_id: collect_request_id,
-      order_amount: data.order_amount,
-      transaction_amount: data.transaction_amount,
-      payment_mode: data.payment_mode,
-      payment_details: data.payment_details,
-      bank_reference: data.bank_reference,
-      payment_message: data.payment_message,
-      status: data.status,
-      error_message: data.error_message,
-      payment_time: data.payment_time,
+      order_amount: data.amount || 0,
+      transaction_amount: data.amount || 0,
+      payment_mode: data?.details?.payment_methods || "NA", 
+      payment_details: data?.details || "NA",
+      bank_reference: "NA",
+      payment_message: data.status === "SUCCESS" ? "Payment Successful" : "Payment Failed",
+      status: data?.status || "Success",
+      error_message: "NA",
+      payment_time: new Date().toISOString(),
     });
     return res.json(data);
   } catch (error) {

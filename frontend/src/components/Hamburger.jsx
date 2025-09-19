@@ -1,6 +1,4 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from './Button';
 import { IoClose } from 'react-icons/io5';
 import { useMainContext } from '../context';
 
@@ -32,19 +30,6 @@ export default function Hamburger({theme}) {
                     >
                         Check Status
                     </Link>
-                </div>
-
-                <div className="mt-8 flex flex-col space-y-4">
-                    <Button
-                        label="Add School"
-                        onClick={() => setModal("school-modal")}
-                        className="bg-indigo-500 hover:bg-indigo-600 text-white w-full"
-                    />
-                    <Button
-                        label="Add Student"
-                        onClick={() => setModal("student-modal")}
-                        className="bg-green-500 hover:bg-green-600 text-white w-full"
-                    />
                 </div>
             </div>
         </div>

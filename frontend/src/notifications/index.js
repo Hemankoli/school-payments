@@ -1,6 +1,7 @@
 import toast from "react-hot-toast"
 
 export const failedPayment = () => {toast.error("Failed to generate payment link")}
+export const adminAccess = () => {toast.error("Please Enter Correct Admin Email and Password")}
 
 export const schoolAdded = () => {toast.success("School Added Successfully!")}
 export const schoolAlreadyExist = () => {toast.error("School with this name already added!")}

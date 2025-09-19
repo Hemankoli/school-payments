@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Navbar from '../components/NavBar'
 import TransactionsOverview from './TransactionsOverview';
 import { useMainContext } from '../context';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home({ theme, setTheme }) {
+    const navigate = useNavigate();
+    const { fetchAllData, fetchData } = useMainContext();
 
-    const { fetchAllData, fetchData} = useMainContext();
+    useEffect(() => {
+        const user = JSON.parse(sessionStorage.getItem("user"));
+        if (!user || user.role !== "admin") {
+            navigate("/");
+        }
+    }, [navigate]);
 
     useEffect(() => {
         localStorage.setItem("theme", theme);

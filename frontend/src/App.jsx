@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast';
 import { useState } from "react";
 import Login from "./components/Login";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import AdminLogin from "./components/AdminLogin";
 
 export default function App() {
   const {modal} = useMainContext();
@@ -17,10 +18,11 @@ export default function App() {
     <BrowserRouter>
       <Toaster />
       <Routes>
+        <Route path="/admin-access" element={<AdminLogin />} />
         <Route path="/admin-dashboard" element={<Home theme={theme} setTheme={setTheme} />} />
         <Route path="/admin-dashboard/check-status" element={<CheckStatus theme={theme}  />} />
         <Route path="/admin-dashboard/transactions-by-school" element={<TransactionBySchool theme={theme}  />} />
-        <Route path="/login-and-pay" element={<Login  />} />
+        <Route path="/" element={<Login  />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
       {modal === "menu-modal" && <Hamburger theme={theme}  key={'menu-modal'} />}

@@ -14,6 +14,6 @@ router.get('/transactions/school/:schoolId', controlller.getAllData);
 router.get('/transaction-status/:customOrderId', controlller.checkTransStatus);
 
 // Payments
-router.post('/', webhook.webhookHandler);
+router.post('/webhook', webhook.webhook);
 
 module.exports = router;

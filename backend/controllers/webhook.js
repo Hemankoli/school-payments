@@ -1,50 +1,59 @@
-const WebhookLog = require("../models/WebhookLog.js");
-const Order = require("../models/Orders.js");
-const OrderStatus = require("../models/OrdersStatus.js");
+const OrdersStatus = require("../models/OrdersStatus");
 
-module.exports.webhookHandler = async (req, res, next) => {
+module.exports.webhook = async (req, res) => {
   try {
     const payload = req.body;
-    const log = await WebhookLog.create({ rawPayload: payload });
-    const orderInfo = payload.order_info || payload.data || null;
-    if (!orderInfo) {
-      await WebhookLog.findByIdAndUpdate(log._id, { processed: false, error: "Missing order_info" });
-      return res.status(400).json({ message: "Missing order_info" });
+
+    if (!payload || !payload.order_info) {
+      return res.status(400).json({ error: "Invalid webhook payload" });
     }
 
-    const collectOrOrderId = orderInfo.order_id;
-    let orderStatus = null;
-    try {
-      if (collectOrOrderId && collectOrOrderId.match && collectOrOrderId.match(/^[0-9a-fA-F]{24}$/)) {
-        orderStatus = await OrderStatus.findById(collectOrOrderId);
-      }
-    } catch (e) {}
-    if (!orderStatus && orderInfo.custom_order_id) {
-      const order = await Order.findOne({ custom_order_id: orderInfo.custom_order_id });
-      if (order) orderStatus = await OrderStatus.findOne({ collect_id: order._id });
-    }
-    if (!orderStatus && orderInfo.bank_reference) {
-      orderStatus = await OrderStatus.findOne({ bank_reference: orderInfo.bank_reference });
+    const {
+      order_id,
+      order_amount,
+      transaction_amount,
+      gateway,
+      bank_reference,
+      status,
+      payment_mode,
+      payemnt_details,
+      Payment_message,
+      payment_time,
+      error_message,
+    } = payload.order_info;
+    let existingOrder = await OrdersStatus.findOne({ collect_id: order_id });
+
+    if (existingOrder) {
+      existingOrder.order_amount = order_amount;
+      existingOrder.transaction_amount = transaction_amount;
+      existingOrder.payment_mode = payment_mode;
+      existingOrder.payment_details = payemnt_details;
+      existingOrder.bank_reference = bank_reference;
+      existingOrder.payment_message = Payment_message;
+      existingOrder.status = status;
+      existingOrder.error_message = error_message;
+      existingOrder.payment_time = payment_time;
+      await existingOrder.save();
+    } else {
+      await OrdersStatus.create({
+        collect_id: order_id,
+        order_amount,
+        transaction_amount,
+        payment_mode,
+        payment_details: payemnt_details,
+        bank_reference,
+        payment_message: Payment_message,
+        status,
+        error_message,
+        payment_time,
+      });
     }
 
-    if (!orderStatus) {
-      await WebhookLog.findByIdAndUpdate(log._id, { processed: false, error: "OrderStatus not found" });
-      return res.status(404).json({ message: "OrderStatus not found" });
-    }
-    orderStatus.order_amount = orderInfo.order_amount ?? orderStatus.order_amount;
-    orderStatus.transaction_amount = orderInfo.transaction_amount ?? orderStatus.transaction_amount;
-    orderStatus.payment_mode = orderInfo.payment_mode ?? orderStatus.payment_mode;
-    orderStatus.payment_details = orderInfo.payemnt_details ?? orderStatus.payment_details;
-    orderStatus.bank_reference = orderInfo.bank_reference ?? orderStatus.bank_reference;
-    orderStatus.payment_message = orderInfo.Payment_message ?? orderStatus.payment_message;
-    orderStatus.status = (orderInfo.status ?? orderStatus.status).toString();
-    orderStatus.error_message = orderInfo.error_message ?? orderStatus.error_message;
-    if (orderInfo.payment_time) orderStatus.payment_time = new Date(orderInfo.payment_time);
-    orderStatus.gateway = orderInfo.gateway ?? orderStatus.gateway;
-    await orderStatus.save();
-    await WebhookLog.findByIdAndUpdate(log._id, { processed: true });
-    res.json({ ok: true });
-  } catch (err) {
-    next(err);
+    console.log("✅ Webhook received and processed:", payload.order_info);
+
+    return res.status(200).json({ message: "Webhook processed successfully" });
+  } catch (error) {
+    console.error("Webhook error:", error.message);
+    return res.status(500).json({ error: "Failed to process webhook" });
   }
-}
+};
