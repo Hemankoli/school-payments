@@ -14,22 +14,23 @@ export default function TransactionsOverview({ theme }) {
   useEffect(() => {
     const mergedData = transactions.map((order) => {
       const statusEntry = transactionsByStatus.find(
-        (s) => s.collect_id === order._id
+        (s) => s?.order_id === order?._id
       );
       return statusEntry ? { ...order, ...statusEntry } : { ...order, status: "Failed" };
     });
     setData(mergedData);
   }, [transactions, transactionsByStatus]);
 
-  const filtered = data.filter((t) => {
-    const matchesStatus = statusFilter ? t.status === statusFilter : ["Success", "Failed"].includes(t.status);
+  const filtered = data?.filter((t) => {
+    const matchesStatus = statusFilter ? t.status === statusFilter : ["SUCCESS", "FAILED"].includes(t.status);
     return matchesStatus;
   });
 
   // Pagination
   const startIndex = (page - 1) * pageSize;
-  const paginated = filtered.slice(startIndex, startIndex + pageSize);
+  const paginated = filtered?.slice(startIndex, startIndex + pageSize);
   const totalPages = Math.ceil(filtered.length / pageSize);
+
 
   return (
     <div className={`${theme === "light" ? "bg-white text-gray-800" : "bg-gray-900 text-white"} rounded-sm shadow-md p-6 transition-colors duration-300`}>

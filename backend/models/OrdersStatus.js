@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const orderStatusSchema = new mongoose.Schema(
   {
+    order_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
     collect_id: { type: String, required: true },
     order_amount: { type: Number, required: true },
     transaction_amount: { type: Number, required: true },

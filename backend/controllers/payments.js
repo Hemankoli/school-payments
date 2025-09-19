@@ -42,7 +42,7 @@ module.exports.loginUser = async (req, res) => {
       await user.save();
     }
 
-    await Orders.create({
+    const order = await Orders.create({
       school_id,
       trustee_id,
       student_info: {
@@ -53,12 +53,12 @@ module.exports.loginUser = async (req, res) => {
       },
       gateway_name: "Edviron",
     });
-
     return res.json({
       user,
       edvironResponse: response.data,
       paymentUrl: response?.data?.collect_request_url,
       collectRequestId: response.data.collect_request_id,
+      order_id: order?._id.toString()
     });
   } catch (error) {
     console.error("Payment error:", error.response?.data || error.message);
@@ -69,31 +69,41 @@ module.exports.loginUser = async (req, res) => {
 module.exports.checkPayment = async (req, res) => {
   try {
     const { collect_request_id } = req.params;
-    const { school_id } = req.query;
+    const { school_id, order_id } = req.query;
     if (!collect_request_id || !school_id) {
       return res.status(400).json({ error: "Missing collect_request_id or school_id" });
     }
     const payload = { school_id, collect_request_id };
     const sign = jwt.sign(payload, process.env.PG_SECRET_KEY, { algorithm: "HS256" });
-    const response = await axios.get(`${process.env.PAYMENT_API_URL}/${collect_request_id}?school_id=${school_id}&sign=${sign}`);
+    const response = await axios.get(`${process.env.PAYMENT_GET_API_URL}/${collect_request_id}?school_id=${school_id}&sign=${sign}`, 
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.PAYMENT_API_KEY}`,
+        },
+      }
+    );
     const data = response.data;
-
-    await OrdersStatus.create({
-      collect_id: collect_request_id,
-      order_amount: data.amount || 0,
-      transaction_amount: data.amount || 0,
-      payment_mode: data?.details?.payment_methods || null, 
-      payment_details: data?.details || {},
-      bank_reference: data?.details?.bank_reference || null,
-      payment_message: data.status === "SUCCESS"
-          ? "Payment Successful"
-          : data.status === "FAILED"
-          ? "Payment Failed"
-          : "Payment Pending",
-      status: data?.status ? data.status.toUpperCase() : "PENDING",
-      error_message: data?.error_message || null,
-      payment_time: new Date(),
-    });
+    const existingData = await OrdersStatus.findOne({ collect_id: collect_request_id});
+    if(!existingData){
+      await OrdersStatus.create({
+        order_id: order_id,
+        collect_id: collect_request_id,
+        order_amount: data.amount || 0,
+        transaction_amount: data.amount || 0,
+        payment_mode: data?.details?.payment_mode || null, 
+        payment_details: data?.details || {},
+        bank_reference: data?.details?.bank_ref || null,
+        payment_message: data.status === "SUCCESS"
+            ? "Payment Successful"
+            : data.status === "FAILED"
+            ? "Payment Failed"
+            : "Payment Pending",
+        status: data?.status ? data.status.toUpperCase() : "PENDING",
+        error_message: data?.error_message || null,
+        payment_time: new Date(),
+      });
+    }
     return res.json(data);
   } catch (error) {
     console.error("Check payment error:", error.response?.data || error.message);

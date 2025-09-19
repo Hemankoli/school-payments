@@ -30,6 +30,7 @@ export default function Login() {
                 amount,
             });
             if (res?.data?.paymentUrl) {
+                sessionStorage.setItem('pending_order_id', res.data.order_id);
                 window.location.href = res?.data?.paymentUrl;
             } else {
                 failedPayment();

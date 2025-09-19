@@ -3,7 +3,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const path = require("path");
 const routes = require("./routes/routes");
 
 const app = express();
@@ -13,14 +12,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const frontendPath = path.join(__dirname, "../frontend/dist"); 
-app.use(express.static(frontendPath));
-
 app.use("/", routes);
-
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
-});
 
 // DB connection
 mongoose

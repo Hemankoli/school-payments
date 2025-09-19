@@ -5,9 +5,9 @@ export default function Table({ theme, filtered }) {
 
     const getStatusClass = (status) => {
         switch (status) {
-            case "Success":
+            case "SUCCESS":
                 return "bg-green-100 text-green-700 border-green-300";
-            case "Failed":
+            case "FAILED":
                 return "bg-red-100 text-red-700 border-red-300";
             default:
                 return "bg-gray-100 text-gray-700 border-gray-300";
@@ -66,7 +66,7 @@ export default function Table({ theme, filtered }) {
                                     <span>{txn?.school_id || "NA"}</span>
                                     <button title="Copy School Id" onClick={() => copyToClipboard(txn?.school_id)}><MdContentCopy /> </button>
                                 </td>
-                                <td className="px-4 py-3 border-b">{txn?.gateway || "NA"}</td>
+                                <td className="px-4 py-3 border-b">{txn?.gateway_name || "NA"}</td>
                                 <td className="px-4 py-3 border-b">
                                     {txn?.payment_time ? new Date(txn.payment_time).toLocaleString() : "NA"}
                                 </td>
@@ -90,10 +90,10 @@ export default function Table({ theme, filtered }) {
                                 <td className="px-4 py-3 border-b">
                                     <span
                                         className={`px-3 py-1 rounded-sm text-xs font-semibold border ${getStatusClass(
-                                            txn?.status || "Failed"
+                                            txn?.status || "SUCCESS"
                                         )}`}
                                     >
-                                        {txn?.status || "Failed"}
+                                        {txn?.status || "SUCCESS"}
                                     </span>
                                 </td>
                             </tr>
