@@ -14,7 +14,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use('/', routes)
-
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 // Database connection
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB connected"))
