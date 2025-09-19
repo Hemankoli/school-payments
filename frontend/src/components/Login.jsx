@@ -4,11 +4,13 @@ import InputField from "./InputField";
 import Button from "./Button";
 import axios from 'axios';
 import { Link } from "react-router-dom";
+import { useMainContext } from "../context";
 
 export default function Login() {
     const [form, setForm] = useState({ name: "", email: "", phone: "" });
     const school_id = import.meta.env.VITE_SCHOOL_ID;
     const amount = "100";
+    const { setLoading, loading } = useMainContext();
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -19,6 +21,7 @@ export default function Login() {
             return;
         }
         try {
+            setLoading(true);
             const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login-and-pay`, {
                 ...form,
                 school_id,
@@ -34,6 +37,8 @@ export default function Login() {
         } catch (err) {
             console.error("Login/Payment error:", err);
             failedPayment();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -68,7 +73,7 @@ export default function Login() {
                     />
                     <Link className="text-[14px] flex justify-end underline italic text-orange-500" to={"/admin-access"}>Admin Login</Link>
                 </form>
-                <Button className="w-fit mx-auto  flex items-center" label={"Save and Pay"} onClick={handleLogin} />
+                <Button disabled={loading} className="w-fit mx-auto  flex items-center" label={"Save and Pay"} onClick={handleLogin} />
             </div>
         </section>
     );

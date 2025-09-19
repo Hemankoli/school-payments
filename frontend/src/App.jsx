@@ -10,14 +10,16 @@ import Login from "./components/Login";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import AdminLogin from "./components/AdminLogin";
 import PageNotFound from "./pages/PageNotFound";
+import { Loader } from "./components/Loader";
 
 export default function App() {
-  const {modal} = useMainContext();
+  const {modal, loading} = useMainContext();
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
   
   return (
     <BrowserRouter>
       <Toaster />
+      {loading && <Loader />}
       <Routes>
         <Route path="*" element={<PageNotFound />} />
         <Route path="/admin-access" element={<AdminLogin />} />

@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const path = require("path");
 const routes = require("./routes/routes");
 
 const app = express();
@@ -12,15 +13,20 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Routes
-app.use('/', routes)
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-// Database connection
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.log(err));
+const frontendPath = path.join(__dirname, "../frontend/dist"); 
+app.use(express.static(frontendPath));
+
+app.use("/", routes);
+
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
+// DB connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error(err));
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);

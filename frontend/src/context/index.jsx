@@ -7,6 +7,7 @@ export const useMainContext = () => useContext(MainContext);
 
 export const MainProvider = ({ children }) => {
     const [modal, setModal] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [transactions, setTransactions] = useState([]);
     const [transactionsByStatus, setTransactionsByStatus] = useState([]);
 
@@ -30,6 +31,7 @@ export const MainProvider = ({ children }) => {
 
     const values = {
         modal, setModal,
+        loading, setLoading,
         fetchData, fetchAllData,
         onClose, transactions, transactionsByStatus,
     }
