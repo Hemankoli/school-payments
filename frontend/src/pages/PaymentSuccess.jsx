@@ -16,11 +16,15 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     const verifyPayment = async () => {
+      console.log("url", `${import.meta.env.VITE_API_BASE_URL}/check-payment/${collect_request_id}?school_id=${school_id}&order_id=${storedOrderId}`)
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/check-payment/${collect_request_id}?school_id=${school_id}&order_id=${storedOrderId}`
         );
-        console.log("url", `${import.meta.env.VITE_API_BASE_URL}/check-payment/${collect_request_id}?school_id=${school_id}&order_id=${storedOrderId}`)
+        if (res.status === 404) {
+          setStatusMessage("❌ Payment verification service not available. Please contact support.");
+          return;
+        }
         setPaymentData(res.data);
         if (urlStatus === "SUCCESS" || res.data.status === "SUCCESS") {
           setStatusMessage("✅ Payment Successful! Thank you for your payment.");
