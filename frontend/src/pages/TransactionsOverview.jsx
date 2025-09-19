@@ -16,7 +16,7 @@ export default function TransactionsOverview({ theme }) {
       const statusEntry = transactionsByStatus.find(
         (s) => s?.order_id === order?._id
       );
-      return statusEntry ? { ...order, ...statusEntry } : { ...order, status: "Failed" };
+      return statusEntry ? { ...order, ...statusEntry } : { ...order, status: "FAILED" };
     });
     setData(mergedData);
   }, [transactions, transactionsByStatus]);
