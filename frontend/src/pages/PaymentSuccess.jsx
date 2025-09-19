@@ -20,6 +20,7 @@ export default function PaymentSuccess() {
         const res = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/check-payment/${collect_request_id}?school_id=${school_id}&order_id=${storedOrderId}`
         );
+        console.log("url", `${import.meta.env.VITE_API_BASE_URL}/check-payment/${collect_request_id}?school_id=${school_id}&order_id=${storedOrderId}`)
         setPaymentData(res.data);
         if (urlStatus === "SUCCESS" || res.data.status === "SUCCESS") {
           setStatusMessage("✅ Payment Successful! Thank you for your payment.");
