@@ -9,6 +9,7 @@ import { useState } from "react";
 import Login from "./components/Login";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import AdminLogin from "./components/AdminLogin";
+import PageNotFound from "./pages/PageNotFound";
 
 export default function App() {
   const {modal} = useMainContext();
@@ -18,6 +19,7 @@ export default function App() {
     <BrowserRouter>
       <Toaster />
       <Routes>
+        <Route path="*" element={<PageNotFound />} />
         <Route path="/admin-access" element={<AdminLogin />} />
         <Route path="/admin-dashboard" element={<Home theme={theme} setTheme={setTheme} />} />
         <Route path="/admin-dashboard/check-status" element={<CheckStatus theme={theme}  />} />
