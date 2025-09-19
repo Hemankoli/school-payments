@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { failedPayment } from "../notifications";
+import { failedPayment, phoneLengthIsGreater } from "../notifications";
 import InputField from "./InputField";
 import Button from "./Button";
 import axios from 'axios';
@@ -14,6 +14,10 @@ export default function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        if(form.phone.length < 10 || form.phone.length > 10) {
+            phoneLengthIsGreater();
+            return;
+        }
         try {
             const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login-and-pay`, {
                 ...form,

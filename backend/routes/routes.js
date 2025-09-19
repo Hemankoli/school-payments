@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const user = require("../controllers/user");
+const payments = require("../controllers/payments");
 const controlller = require("../controllers/controller");
 const webhook = require("../controllers/webhook");
 
 // Users Route
-router.post('/login-and-pay', user.loginUser);
-router.get("/check-payment/:collect_request_id", user.checkPayment);
+router.post('/login-and-pay', payments.loginUser);
+router.get("/check-payment/:collect_request_id", payments.checkPayment);
 
 router.get('/get-orders', controlller.getAllTrans);
 router.get('/get-all-orders', controlller.getAllTransData);

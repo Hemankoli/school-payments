@@ -75,26 +75,24 @@ module.exports.checkPayment = async (req, res) => {
     }
     const payload = { school_id, collect_request_id };
     const sign = jwt.sign(payload, process.env.PG_SECRET_KEY, { algorithm: "HS256" });
-
-    const response = await axios.get(`${process.env.PAYMENT_API_URL}/${collect_request_id}?school_id=${school_id}&sign=${sign}`,{
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.PAYMENT_API_KEY}`,
-        },
-      }
-    );
+    const response = await axios.get(`${process.env.PAYMENT_API_URL}/${collect_request_id}?school_id=${school_id}&sign=${sign}`);
     const data = response.data;
+
     await OrdersStatus.create({
       collect_id: collect_request_id,
       order_amount: data.amount || 0,
       transaction_amount: data.amount || 0,
-      payment_mode: data?.details?.payment_methods || "NA", 
-      payment_details: data?.details || "NA",
-      bank_reference: "NA",
-      payment_message: data.status === "SUCCESS" ? "Payment Successful" : "Payment Failed",
-      status: data?.status || "Success",
-      error_message: "NA",
-      payment_time: new Date().toISOString(),
+      payment_mode: data?.details?.payment_methods || null, 
+      payment_details: data?.details || {},
+      bank_reference: data?.details?.bank_reference || null,
+      payment_message: data.status === "SUCCESS"
+          ? "Payment Successful"
+          : data.status === "FAILED"
+          ? "Payment Failed"
+          : "Payment Pending",
+      status: data?.status ? data.status.toUpperCase() : "PENDING",
+      error_message: data?.error_message || null,
+      payment_time: new Date(),
     });
     return res.json(data);
   } catch (error) {
