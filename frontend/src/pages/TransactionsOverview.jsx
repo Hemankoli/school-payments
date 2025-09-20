@@ -12,10 +12,10 @@ export default function TransactionsOverview({ theme }) {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const mergedData = transactions.map((order) => {
-      const statusEntry = transactionsByStatus.find(
+    const mergedData = transactions?.map((order) => {
+      const statusEntry = transactionsByStatus?.find(
         (s) => s?.order_id === order?._id
-      );
+      )
       return statusEntry ? { ...order, ...statusEntry } : { ...order, status: "FAILED" };
     });
     setData(mergedData);
@@ -40,7 +40,7 @@ export default function TransactionsOverview({ theme }) {
           <Selects
             theme={theme}
             label="Status"
-            options={["Success", "Failed"].map((status) => ({
+            options={["SUCCESS", "FAILED"].map((status) => ({
               value: status,
               label: status,
             }))}
